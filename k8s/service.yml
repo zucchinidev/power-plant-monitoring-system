@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sensors-api
+  labels:
+    app: /sensors-api/
+    ns: production
+  namespace: production
+spec:
+  ports:
+    - port: 9000
+      protocol: TCP
+      targetPort: 9000
+  selector:
+    app: /sensors-api/
+    ns: production
+  type: ClusterIP
+
