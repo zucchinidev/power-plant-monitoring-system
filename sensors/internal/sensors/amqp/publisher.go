@@ -10,12 +10,12 @@ type Publisher struct {
 	queue  *amqp.Queue
 }
 
-func NewPublisher(b *broker.Broker, queueName string, tracker *SensorListQueueTracker) (*Publisher, error) {
+func NewPublisher(b *broker.Broker, queueName string, tracker *SensorQueueNameEmitter) (*Publisher, error) {
 	q, err := b.CreateQueue(queueName)
 	if err != nil {
 		return nil, err
 	}
-	if err := tracker.TrackQueue(q); err != nil {
+	if err := tracker.Emit(q); err != nil {
 		return nil, err
 	}
 	return &Publisher{broker: b, queue: q}, nil

@@ -82,11 +82,8 @@ var rootCmd = &cobra.Command{
 		signalTick := time.Tick(dur)
 		buf := new(bytes.Buffer)
 		enc := gob.NewEncoder(buf)
-		queueTracker, err := amqp.NewSensorListQueueTracker(brokerManager)
-		if err != nil {
-			l.Panic(err)
-		}
-		publisher, err := amqp.NewPublisher(brokerManager, name, queueTracker)
+		queueNameEmitter := amqp.NewSensorQueueNameEmitter(brokerManager)
+		publisher, err := amqp.NewPublisher(brokerManager, name, queueNameEmitter)
 		if err != nil {
 			l.Panic(err)
 		}
