@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
-	"github.com/zucchinidev/power-plant-monitoring-system/sensors/internal/sensors"
 	"github.com/zucchinidev/power-plant-monitoring-system/sensors/internal/sensors/amqp"
 	"github.com/zucchinidev/power-plant-monitoring-system/sensors/internal/sensors/sendingDataSensor"
+	"github.com/zucchinidev/power-plant-monitoring-system/sensors/internal/shared/message"
 	"github.com/zucchinidev/power-plant-monitoring-system/sensors/shared/adapters/broker"
 	"io"
 	"log"
@@ -41,6 +41,7 @@ func init() {
 	rootCmd.Flags().Float64Var(&step, "step", 0.1, "maximum allowable change per measurement")
 	value = r.Float64()*(max-min) + min
 	nom = (max-min)/2 + min
+	gob.Register(message.SensorMessage{})
 }
 
 func calcValue() {
@@ -57,7 +58,7 @@ func calcValue() {
 
 var rootCmd = &cobra.Command{
 	Use:   "sensors-api",
-	Short: "sensors-api is a very fast service to execute sql queries",
+	Short: "sensors-api",
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
 			l             = logger.New()
@@ -81,7 +82,6 @@ var rootCmd = &cobra.Command{
 		}
 		signalTick := time.Tick(dur)
 		buf := new(bytes.Buffer)
-		enc := gob.NewEncoder(buf)
 		queueNameEmitter := amqp.NewSensorQueueNameEmitter(brokerManager)
 		publisher, err := amqp.NewPublisher(brokerManager, name, queueNameEmitter)
 		if err != nil {
@@ -92,14 +92,14 @@ var rootCmd = &cobra.Command{
 		go func() {
 			for range signalTick {
 				calcValue()
-				reading := sensors.SensorMessage{
+				reading := message.SensorMessage{
 					Name:      name,
 					Value:     value,
-					Timestamp: time.Now(),
+					Timestamp: time.Now().UTC(),
 				}
 
 				buf.Reset()
-				if err := enc.Encode(reading); err != nil {
+				if err := gob.NewEncoder(buf).Encode(reading); err != nil {
 					l.Panic(err)
 				}
 
