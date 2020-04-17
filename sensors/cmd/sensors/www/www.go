@@ -2,7 +2,7 @@ package www
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/zucchinidev/power-plant-monitoring-system/sensors/cmd/sensors-api/www/statusHandler"
+	"github.com/zucchinidev/power-plant-monitoring-system/sensors/cmd/sensors/www/statusHandler"
 	"github.com/zucchinidev/power-plant-monitoring-system/sensors/shared/ping"
 	"net/http"
 )

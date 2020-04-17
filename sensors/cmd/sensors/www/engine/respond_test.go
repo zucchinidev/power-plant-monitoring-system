@@ -3,7 +3,7 @@ package engine_test
 import (
 	"encoding/json"
 	"errors"
-	"github.com/zucchinidev/power-plant-monitoring-system/sensors/cmd/sensors-api/www/engine"
+	"github.com/zucchinidev/power-plant-monitoring-system/sensors/cmd/sensors/www/engine"
 	"net/http"
 	"net/http/httptest"
 	"testing"

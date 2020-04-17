@@ -2,15 +2,15 @@ package statusHandler
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"github.com/zucchinidev/power-plant-monitoring-system/sensors/cmd/sensors-api/www/engine"
+	"github.com/zucchinidev/power-plant-monitoring-system/sensors/cmd/sensors/www/engine"
 	"github.com/zucchinidev/power-plant-monitoring-system/sensors/shared/ping"
 	"net/http"
 	"strings"
 )
 
 type statusResp struct {
-	Status  string `json:"status"`
-	Msg     string `json:"msg"`
+	Status string `json:"status"`
+	Msg    string `json:"msg"`
 }
 
 func Status(pings []ping.Pinger) httprouter.Handle {

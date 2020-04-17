@@ -57,8 +57,8 @@ func calcValue() {
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "sensors-api",
-	Short: "sensors-api",
+	Use:   "sensors",
+	Short: "sensors",
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
 			l             = logger.New()

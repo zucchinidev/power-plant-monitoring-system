@@ -2,26 +2,26 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: /sensors-api/
+    app: /sensors/
     ns: production
-  name: sensors-api
+  name: sensors
   namespace: production
 spec:
   replicas: 0
   selector:
     matchLabels:
-      app: /sensors-api/
+      app: /sensors/
       ns: production
   template:
     metadata:
       labels:
-        app: /sensors-api/
+        app: /sensors/
         ns: production
       namespace: production
     spec:
       containers:
         - command:
-            - sensors-api
+            - sensors
           env:
             - name: POWER_PLANT_MONITORING_SQL_DB_HOST
               valueFrom:
@@ -45,8 +45,8 @@ spec:
                   key: SQL_DB_PASS
           envFrom:
             - configMapRef:
-                name: sensors-api
-          image: registry.zucchinidev.com/sensors-api:v1.0.0-rc
+                name: sensors
+          image: registry.zucchinidev.com/sensors:v1.0.0-rc
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 3
@@ -57,7 +57,7 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
-          name: sensors-api
+          name: sensors
           ports:
             - containerPort: 9000
               protocol: TCP

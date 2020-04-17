@@ -7,12 +7,12 @@ services:
       - "9000:9000"
     env_file:
       - env/development.env
-    command: "sensors-api"
-    container_name: sensors-api
+    command: "sensors"
+    container_name: sensors
     networks:
       golang:
         aliases:
-          - sensors-api
+          - sensors
 networks:
   golang:
     external: true
