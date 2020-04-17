@@ -83,10 +83,20 @@ var rootCmd = &cobra.Command{
 		signalTick := time.Tick(dur)
 		buf := new(bytes.Buffer)
 		queueNameEmitter := amqp.NewSensorQueueNameEmitter(brokerManager)
-		publisher, err := amqp.NewPublisher(brokerManager, name, queueNameEmitter)
+		publisher, err := amqp.NewDataSensorPublisher(brokerManager, name)
 		if err != nil {
 			l.Panic(err)
 		}
+		nameEmitterFn := queueNameEmitterFn(queueNameEmitter, publisher)
+
+		if err = nameEmitterFn(); err != nil {
+			l.Panic(err)
+		}
+		coordinatorStartedReceptor, err := amqp.NewCoordinatorStartedReceptor(brokerManager, nameEmitterFn)
+		if err != nil {
+			l.Panic(err)
+		}
+		coordinatorStartedReceptor.ListenForDiscoverCoordinators()
 		dataSensorSender := sendingDataSensor.NewService(publisher)
 
 		go func() {
@@ -123,6 +133,12 @@ var rootCmd = &cobra.Command{
 			}
 		}
 	},
+}
+
+func queueNameEmitterFn(queueNameEmitter *amqp.SensorQueueNameEmitter, publisher *amqp.DataSensorPublisher) func() error {
+	return func() error {
+		return queueNameEmitter.Emit(publisher.Queue())
+	}
 }
 
 // Execute assembles the app commands necessaries to up the applications

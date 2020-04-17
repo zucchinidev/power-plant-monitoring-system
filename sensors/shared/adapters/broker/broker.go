@@ -6,7 +6,10 @@ import (
 	"github.com/zucchinidev/power-plant-monitoring-system/sensors/shared/consumer"
 )
 
-const prefix = "power_plant_monitoring_system"
+const (
+	prefix                  = "power_plant_monitoring_system"
+	SensorDiscoveryExchange = "SensorDiscoveryExchange"
+)
 
 type Cfg struct {
 	Exchange string

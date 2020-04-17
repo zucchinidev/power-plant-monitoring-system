@@ -5,23 +5,20 @@ import (
 	"github.com/zucchinidev/power-plant-monitoring-system/sensors/shared/adapters/broker"
 )
 
-type Publisher struct {
+type DataSensorPublisher struct {
 	broker *broker.Broker
 	queue  *amqp.Queue
 }
 
-func NewPublisher(b *broker.Broker, queueName string, tracker *SensorQueueNameEmitter) (*Publisher, error) {
+func NewDataSensorPublisher(b *broker.Broker, queueName string) (*DataSensorPublisher, error) {
 	q, err := b.CreateQueue(queueName)
 	if err != nil {
 		return nil, err
 	}
-	if err := tracker.Emit(q); err != nil {
-		return nil, err
-	}
-	return &Publisher{broker: b, queue: q}, nil
+	return &DataSensorPublisher{broker: b, queue: q}, nil
 }
 
-func (s *Publisher) Publish(b []byte) error {
+func (s *DataSensorPublisher) Publish(b []byte) error {
 	return s.broker.Channel().Publish(
 		"",
 		s.queue.Name,
@@ -29,4 +26,8 @@ func (s *Publisher) Publish(b []byte) error {
 		false,
 		amqp.Publishing{Body: b},
 	)
+}
+
+func (p *DataSensorPublisher) Queue() *amqp.Queue {
+	return p.queue
 }

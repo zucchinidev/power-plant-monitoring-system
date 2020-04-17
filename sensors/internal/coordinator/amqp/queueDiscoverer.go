@@ -7,6 +7,7 @@ import (
 	"github.com/streadway/amqp"
 	"github.com/zucchinidev/power-plant-monitoring-system/sensors/internal/shared/message"
 	"github.com/zucchinidev/power-plant-monitoring-system/sensors/shared/adapters/broker"
+	"log"
 )
 
 type QueueDiscoverer struct {
@@ -50,6 +51,8 @@ func (q *QueueDiscoverer) ListenForNewSource() {
 		false,
 		nil)
 
+	q.discoverSensors()
+
 	// when a message come in, it's going to indicate that a new sensor has come online and
 	// is ready to send readings into the system. In order to receive those messages, we are going to use the
 	// channel consume method to get access sensor's queue
@@ -91,4 +94,25 @@ func (q *QueueDiscoverer) addListener(dataChan <-chan amqp.Delivery) {
 			ed,
 		)
 	}
+}
+
+func (q *QueueDiscoverer) discoverSensors() {
+	err := q.broker.Channel().ExchangeDeclare(
+		broker.SensorDiscoveryExchange,
+		"fanout",
+		false,
+		false,
+		false, // You'll set this to true if you want this exchange to reject external publish request
+		false,
+		nil,
+	)
+	if err != nil {
+		log.Panic(err)
+	}
+	_ = q.broker.Channel().Publish(
+		broker.SensorDiscoveryExchange,
+		"", // signal the sensors that we're looking for them
+		false,
+		false,
+		amqp.Publishing{})
 }
