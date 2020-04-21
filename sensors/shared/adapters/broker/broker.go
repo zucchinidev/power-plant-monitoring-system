@@ -92,10 +92,14 @@ func (b *Broker) bindTopics(ch *amqp.Channel, queueName string, topics []string)
 }
 
 func (b *Broker) declareQueue(channel *amqp.Channel, name string) (amqp.Queue, error) {
+	autoDelete := false
+	if name == "" {
+		autoDelete = true
+	}
 	return channel.QueueDeclare(
 		name,
 		false,
-		false,
+		autoDelete,
 		false,
 		false,
 		nil,

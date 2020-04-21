@@ -12,7 +12,7 @@ type CoordinatorStartedReceptor struct {
 }
 
 func NewCoordinatorStartedReceptor(b *broker.Broker, nameEmitterFn func() error) (*CoordinatorStartedReceptor, error) {
-	q, err := b.CreateQueue("queueName")
+	q, err := b.CreateQueue("")
 	if err != nil {
 		return nil, err
 	}
