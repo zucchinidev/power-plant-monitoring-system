@@ -58,6 +58,7 @@ func (q *QueueDiscoverer) ListenForNewSource() {
 	// channel consume method to get access sensor's queue
 	for sensorNameChan := range msgs {
 		sensorName := string(sensorNameChan.Body)
+		q.eventAggregator.PublishEvent("DataSourceDiscovered", sensorName)
 		sensorDataChan, _ := q.broker.Channel().Consume(
 			sensorName,
 			"",

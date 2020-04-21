@@ -2,19 +2,25 @@ package amqp
 
 import "time"
 
+type callable func(interface{})
+
+type EventRaiser interface {
+	AddListener(eventName string, f callable)
+}
+
 type EventAggregator struct {
-	listeners map[string][]func(EventData)
+	listeners map[string][]callable
 }
 
 func NewEventAggregator() *EventAggregator {
-	return &EventAggregator{listeners: make(map[string][]func(EventData))}
+	return &EventAggregator{listeners: make(map[string][]callable)}
 }
 
-func (ea *EventAggregator) AddListener(eventName string, f func(EventData)) {
+func (ea *EventAggregator) AddListener(eventName string, f callable) {
 	ea.listeners[eventName] = append(ea.listeners[eventName], f)
 }
 
-func (ea *EventAggregator) PublishEvent(eventName string, eventData EventData) {
+func (ea *EventAggregator) PublishEvent(eventName string, eventData interface{}) {
 	if listeners, ok := ea.listeners[eventName]; ok {
 		for _, listener := range listeners {
 			listener(eventData)
