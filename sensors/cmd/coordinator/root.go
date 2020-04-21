@@ -30,8 +30,13 @@ var rootCmd = &cobra.Command{
 			return
 		}
 		defer brokerManager.Close()
-
-		go amqp.NewQueueDiscoverer(brokerManager).ListenForNewSource()
+		eventAggregator := amqp.NewEventAggregator()
+		databaseConsumer, err := amqp.NewDatabaseConsumer(brokerManager, eventAggregator)
+		if err != nil {
+			l.ShowBrokerError(err)
+		}
+		go databaseConsumer.StartConsumer()
+		go amqp.NewQueueDiscoverer(brokerManager, eventAggregator).ListenForNewSource()
 
 		shutdown := make(chan struct{}, 1)
 		killFn := terminate([]io.Closer{brokerManager}, l)

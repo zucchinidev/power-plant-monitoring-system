@@ -21,11 +21,11 @@ type QueueDiscoverer struct {
 	eventAggregator *EventAggregator
 }
 
-func NewQueueDiscoverer(broker *broker.Broker) *QueueDiscoverer {
+func NewQueueDiscoverer(broker *broker.Broker, aggregator *EventAggregator) *QueueDiscoverer {
 	return &QueueDiscoverer{
 		broker:          broker,
 		sources:         make(map[string]<-chan amqp.Delivery),
-		eventAggregator: NewEventAggregator()}
+		eventAggregator: aggregator}
 }
 func (q *QueueDiscoverer) ListenForNewSource() {
 	queue, _ := q.broker.CreateQueue("") // RabbitMQ will create a unique name for it
@@ -58,7 +58,7 @@ func (q *QueueDiscoverer) ListenForNewSource() {
 	// channel consume method to get access sensor's queue
 	for sensorNameChan := range msgs {
 		sensorName := string(sensorNameChan.Body)
-		q.eventAggregator.PublishEvent("DataSourceDiscovered", sensorName)
+		q.eventAggregator.PublishEvent(DataSourceDiscovered, sensorName)
 		sensorDataChan, _ := q.broker.Channel().Consume(
 			sensorName,
 			"",
